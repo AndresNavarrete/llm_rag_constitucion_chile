@@ -3,11 +3,11 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 
 ARTICLE_HEADER_RE = re.compile(
-    r"^(?P<header>#{1,6}\s*Art[ií]culo\s+(?P<number>[\w\.-]+).*)$",
+    r"^(?P<header>#{1,6}\s*Art[ií]culo\s+(?P<number>[\w\.\- ]+).*)$",
     re.IGNORECASE | re.MULTILINE,
 )
 CHAPTER_HEADER_RE = re.compile(r"^#{1,6}\s*(Cap[ií]tulo\s+.+)$", re.IGNORECASE)
@@ -33,23 +33,33 @@ def load_markdown(path: Path) -> str:
         raise OSError(f"Error al leer el archivo {path}: {exc}") from exc
 
 
-def split_by_articles(markdown_text: str, source: str = "legalize-cl") -> List[ParsedChunk]:
-    """Divide markdown por articulos y conserva metadatos de capitulo."""
+def extract_chapter_title(markdown_text: str, fallback: str = "Sin capitulo") -> str:
+    """Extrae el primer titulo de capitulo detectado en el texto."""
+    for line in markdown_text.splitlines():
+        chapter_match = CHAPTER_HEADER_RE.match(line.strip())
+        if chapter_match:
+            return chapter_match.group(1).strip()
+    return fallback
+
+
+def split_by_articles(
+    markdown_text: str,
+    source: str = "legalize-cl",
+    chapter: Optional[str] = None,
+    chunk_prefix: str = "articulo",
+    extra_metadata: Optional[Dict[str, str]] = None,
+) -> List[ParsedChunk]:
+    """Divide markdown por articulos y conserva metadatos relevantes."""
     matches = list(ARTICLE_HEADER_RE.finditer(markdown_text))
     if not matches:
         raise ValueError(
             "No se encontraron encabezados de articulo. "
-            "Verifica el formato esperado: '## Articulo X'."
+            "Verifica el formato esperado: '##/### Articulo X'."
         )
 
     chunks: List[ParsedChunk] = []
-    current_chapter = "Sin capitulo"
-
-    lines = markdown_text.splitlines()
-    for line in lines:
-        chapter_match = CHAPTER_HEADER_RE.match(line.strip())
-        if chapter_match:
-            current_chapter = chapter_match.group(1).strip()
+    chapter_name = chapter or extract_chapter_title(markdown_text)
+    metadata_extra = extra_metadata or {}
 
     for idx, match in enumerate(matches):
         start = match.start()
@@ -57,23 +67,14 @@ def split_by_articles(markdown_text: str, source: str = "legalize-cl") -> List[P
         content = markdown_text[start:end].strip()
         article_number = match.group("number").strip()
 
-        # Busca capitulo mas cercano hacia atras para metadato.
-        previous_text = markdown_text[:start]
-        chapter_lines = previous_text.splitlines()
-        chapter_for_chunk = "Sin capitulo"
-        for line in reversed(chapter_lines):
-            chapter_match = CHAPTER_HEADER_RE.match(line.strip())
-            if chapter_match:
-                chapter_for_chunk = chapter_match.group(1).strip()
-                break
-
         chunk = ParsedChunk(
-            chunk_id=f"articulo_{article_number}_{idx}",
+            chunk_id=f"{chunk_prefix}_{article_number}_{idx}",
             text=content,
             metadata={
                 "articulo": article_number,
-                "capitulo": chapter_for_chunk,
+                "capitulo": chapter_name,
                 "fuente": source,
+                **metadata_extra,
             },
         )
         chunks.append(chunk)

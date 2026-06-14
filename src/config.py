@@ -11,8 +11,10 @@ class Settings:
 
     project_root: Path = Path(__file__).resolve().parent.parent
     data_file: Path = project_root / "data" / "constitucion.md"
+    raw_repo_dir: Path = project_root / "data" / "raw" / "constitucion_chile"
     chroma_dir: Path = project_root / "chroma_db"
-    collection_name: str = "constitucion_chile"
+    current_collection_name: str = "current_constitution"
+    history_collection_name: str = "constitutional_history"
 
     embedding_model: str = "text-embedding-3-small"
     chat_model: str = "gpt-4o-mini"

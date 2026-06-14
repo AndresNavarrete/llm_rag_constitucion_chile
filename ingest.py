@@ -10,7 +10,10 @@ def main() -> None:
     try:
         markdown_text = load_markdown(settings.data_file)
         chunks = split_by_articles(markdown_text)
-        inserted = upsert_chunks(chunks)
+        inserted = upsert_chunks(
+            chunks,
+            collection_name=settings.current_collection_name,
+        )
     except Exception as exc:
         print(f"[ERROR] Fallo la ingesta: {exc}")
         raise SystemExit(1) from exc
