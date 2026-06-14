@@ -15,15 +15,25 @@ Pipeline RAG para consultas sobre la Constitucion Politica de la Republica de Ch
 
 ## Requisitos
 
-- Python 3.10+
+- Python 3.11+
 - `OPENAI_API_KEY` configurada
 
-## Instalacion
+## Entorno (uv recomendado)
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate  # En Windows: .venv\\Scripts\\activate
-pip install -r requirements.txt
+uv sync
+```
+
+Esto crea/actualiza `.venv` e instala dependencias de `pyproject.toml`.
+
+Si no tienes `uv`:
+
+```bash
+# macOS/Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Windows (PowerShell)
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
 ## Uso
@@ -32,13 +42,13 @@ pip install -r requirements.txt
 2. Ejecuta la ingesta:
 
 ```bash
-python ingest.py
+uv run python ingest.py
 ```
 
 3. Levanta la app:
 
 ```bash
-streamlit run app.py
+uv run streamlit run app.py
 ```
 
 ## Ingesta Historica (con commits)
@@ -54,12 +64,40 @@ git clone https://github.com/opensourcechile/constitucion_chile.git data/raw/con
 2. Ejecuta:
 
 ```bash
-python ingest_history.py
+uv run python ingest_history.py
 ```
 
 Esto pobla dos colecciones en Chroma:
 - `current_constitution`
 - `constitutional_history`
+
+## Buenas practicas recomendadas
+
+- Instalar dependencias solo via `uv sync`.
+- Ejecutar comandos con `uv run ...` para garantizar el entorno correcto.
+- Mantener `pyproject.toml` como fuente de verdad de dependencias.
+- Opcional para calidad de codigo:
+
+```bash
+uv run ruff check .
+```
+
+## Logs de uso y costo OpenAI
+
+Cada llamada a OpenAI (embeddings y chat) se registra localmente en:
+- `logs/openai_usage.jsonl`
+
+Incluye:
+- endpoint y modelo
+- metadatos de request
+- tokens (`prompt`, `completion`, `total`)
+- costo estimado en USD
+
+Resumen rapido:
+
+```bash
+uv run python scripts_usage_report.py
+```
 
 ## Comportamiento anti-alucinacion
 

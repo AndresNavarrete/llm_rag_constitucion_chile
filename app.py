@@ -7,6 +7,7 @@ from openai import OpenAI
 
 from src.config import settings
 from src.database import search_similar
+from src.openai_usage import log_openai_usage
 
 
 SYSTEM_PROMPT = """Eres un asistente legal especializado en la Constitucion Politica de la Republica de Chile.
@@ -35,12 +36,31 @@ def stream_answer(prompt: str) -> Generator[str, None, None]:
         ],
         temperature=0,
         stream=True,
+        stream_options={"include_usage": True},
     )
 
+    usage = None
     for chunk in stream:
+        if getattr(chunk, "usage", None):
+            usage = {
+                "prompt_tokens": chunk.usage.prompt_tokens,
+                "completion_tokens": chunk.usage.completion_tokens,
+                "total_tokens": chunk.usage.total_tokens,
+            }
         delta = chunk.choices[0].delta.content
         if delta:
             yield delta
+
+    log_openai_usage(
+        endpoint="chat.completions.create",
+        model=settings.chat_model,
+        request_meta={
+            "stream": True,
+            "temperature": 0,
+            "prompt_chars": len(prompt),
+        },
+        usage=usage,
+    )
 
 
 def main() -> None:

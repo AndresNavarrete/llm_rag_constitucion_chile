@@ -4,18 +4,15 @@ from typing import List, Optional, Tuple
 
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
-from langchain_openai import OpenAIEmbeddings
 
 from src.config import settings
+from src.embeddings import LoggedOpenAIEmbeddings
 from src.parser import ParsedChunk
 
 
-def build_embeddings() -> OpenAIEmbeddings:
+def build_embeddings() -> LoggedOpenAIEmbeddings:
     """Construye el cliente de embeddings OpenAI."""
-    return OpenAIEmbeddings(
-        model=settings.embedding_model,
-        api_key=settings.openai_api_key,
-    )
+    return LoggedOpenAIEmbeddings(model=settings.embedding_model)
 
 
 def load_vector_store(collection_name: str) -> Chroma:

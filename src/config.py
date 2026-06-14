@@ -3,7 +3,9 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from pathlib import Path
+from dotenv import load_dotenv
 
+load_dotenv()
 
 @dataclass(frozen=True)
 class Settings:
@@ -13,6 +15,8 @@ class Settings:
     data_file: Path = project_root / "data" / "constitucion.md"
     raw_repo_dir: Path = project_root / "data" / "raw" / "constitucion_chile"
     chroma_dir: Path = project_root / "chroma_db"
+    logs_dir: Path = project_root / "logs"
+    openai_usage_log: Path = logs_dir / "openai_usage.jsonl"
     current_collection_name: str = "current_constitution"
     history_collection_name: str = "constitutional_history"
 
