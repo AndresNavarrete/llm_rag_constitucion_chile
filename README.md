@@ -8,7 +8,9 @@ Pipeline RAG para consultas sobre la Constitucion Politica de la Republica de Ch
 - `src/config.py`: configuracion y rutas
 - `src/parser.py`: chunking semantico por articulo
 - `src/database.py`: insercion y busqueda en Chroma local
+- `src/history_extractor.py`: extraccion historica desde repo git raw
 - `ingest.py`: ingesta y vectorizacion
+- `ingest_history.py`: ingesta commit-aware (vigente + historica)
 - `app.py`: interfaz Streamlit para consulta
 
 ## Requisitos
@@ -38,6 +40,26 @@ python ingest.py
 ```bash
 streamlit run app.py
 ```
+
+## Ingesta Historica (con commits)
+
+Si quieres indexar cambios historicos por ley/commit:
+
+1. Clona la fuente raw dentro del proyecto:
+
+```bash
+git clone https://github.com/opensourcechile/constitucion_chile.git data/raw/constitucion_chile
+```
+
+2. Ejecuta:
+
+```bash
+python ingest_history.py
+```
+
+Esto pobla dos colecciones en Chroma:
+- `current_constitution`
+- `constitutional_history`
 
 ## Comportamiento anti-alucinacion
 

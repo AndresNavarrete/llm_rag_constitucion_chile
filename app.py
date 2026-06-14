@@ -54,6 +54,11 @@ def main() -> None:
         placeholder="Ejemplo: Que establece el articulo 19 sobre igualdad ante la ley?",
         height=100,
     )
+    mode = st.radio(
+        "Modo de consulta",
+        options=["Vigente", "Historica"],
+        horizontal=True,
+    )
 
     if st.button("Consultar", type="primary"):
         if not question.strip():
@@ -61,7 +66,16 @@ def main() -> None:
             return
 
         try:
-            results = search_similar(query=question.strip(), k=settings.retrieval_k)
+            collection_name = (
+                settings.current_collection_name
+                if mode == "Vigente"
+                else settings.history_collection_name
+            )
+            results = search_similar(
+                query=question.strip(),
+                k=settings.retrieval_k,
+                collection_name=collection_name,
+            )
         except Exception as exc:
             st.error(f"Error en retrieval: {exc}")
             return
@@ -75,7 +89,11 @@ def main() -> None:
             for doc, score in results:
                 articulo = doc.metadata.get("articulo", "N/A")
                 capitulo = doc.metadata.get("capitulo", "N/A")
-                st.markdown(f"**Articulo {articulo}** | {capitulo} | score={score:.3f}")
+                ley = doc.metadata.get("ley", "N/A")
+                commit_date = doc.metadata.get("commit_date", "N/A")
+                st.markdown(
+                    f"**Articulo {articulo}** | {capitulo} | ley={ley} | fecha={commit_date} | score={score:.3f}"
+                )
                 st.write(doc.page_content)
                 context_blocks.append(doc.page_content)
 
