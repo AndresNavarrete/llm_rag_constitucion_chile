@@ -1,21 +1,14 @@
 # Cl-Legal-RAG
 
-Asistente RAG para consultas sobre la Constitucion Politica de la Republica de Chile, con soporte para:
-- consulta de texto vigente
-- consulta historica por commits/leyes
-- trazabilidad de costo y uso de OpenAI en logs locales
+**Asistente RAG para consultas sobre la Constitución Política de la República de Chile**
 
-## Estado del proyecto
+Consulta el texto vigente de la constitución y su historia de cambios con precisión jurídica.
 
-Implementado y funcional en local:
-- Ingesta vigente (`scripts/ingest.py`) a coleccion `current_constitution`
-- Ingesta historica commit-aware (`scripts/ingest_history.py`) a coleccion `constitutional_history`
-- App Streamlit con modo `Vigente` y `Historica`, UI mejorada y filtros de alcance
-- Registro local de uso/costo OpenAI en `logs/openai_usage.jsonl`
+---
 
-## Demo visual
+## Demo Visual
 
-Vista principal de la app:
+Vista principal de la aplicación:
 
 ![Vista principal](docs/assets/app_view.png)
 
@@ -23,78 +16,64 @@ Ejemplo de respuesta con contexto:
 
 ![Respuesta ejemplo](docs/assets/app_answer.png)
 
-## Arquitectura
+---
 
-- `data/raw/constitucion_chile/`
-  - Repo raw fuente (`opensourcechile/constitucion_chile`) con historial Git.
-- `src/cl_legal_rag/parser.py`
-  - Chunking por articulos y metadatos juridicos.
-- `src/cl_legal_rag/history_extractor.py`
-  - Extraccion incremental por commit (solo archivos/articulos modificados).
-- `src/cl_legal_rag/database.py`
-  - Chroma local y retrieval.
-- `src/cl_legal_rag/embeddings.py`
-  - Cliente embeddings con batching defensivo y logging de uso.
-- `src/cl_legal_rag/openai_usage.py`
-  - Estimacion de costos y escritura de eventos JSONL.
-- `app/main.py`
-  - UI Streamlit + chat con control anti-alucinacion.
-  - Filtros historicos por ley y rango de fecha.
-  - Control de alcance de contexto (`top-k`) configurable desde la app.
-- `app/prompts/system_prompt.md`
-  - Prompt de sistema desacoplado del codigo Python.
-- `app/styles/main.css`
-  - Estilos visuales de la app.
-- `app/templates/hero.html`
-  - Bloque HTML de cabecera (hero).
-- `app/utils/resources.py`
-  - Loader centralizado de recursos de texto (CSS, templates, prompts).
+## Inicio rápido (3 pasos)
 
-## Requisitos
+### 1. Requisitos
 
 - Python 3.11+
-- `uv`
-- `OPENAI_API_KEY` en `.env`
+- `uv` (administrador de dependencias)
+- Clave de API de OpenAI (obtén una en [platform.openai.com](https://platform.openai.com))
 
-## Setup rapido
-
-1. Instalar dependencias
+### 2. Configurar el proyecto
 
 ```bash
+# Clonar el repositorio
+git clone https://github.com/AndresNavarrete/llm_rag_constitucion_chile.git
+cd llm_rag_constitucion_chile
+
+# Instalar dependencias
 uv sync
+
+# Crear archivo .env con tu clave API
+echo "OPENAI_API_KEY=sk-..." > .env
 ```
 
-2. Configurar API key
-
-Crear `.env` en la raiz:
-
-```env
-OPENAI_API_KEY=sk-...
-```
-
-3. Ingesta historica recomendada
-
-```bash
-uv run python scripts/ingest_history.py
-```
-
-4. Levantar app
+### 3. Ejecutar la aplicación
 
 ```bash
 uv run streamlit run app/main.py
 ```
 
-## Docker
+Abre `http://localhost:8501` en tu navegador.
 
-1. Construir imagen
+---
+
+## Cómo usar
+
+La aplicación tiene dos modos de operación:
+
+**Modo Vigente**
+Consulta el texto actual de la Constitución.
+
+**Modo Histórico**
+Visualiza cambios en la Constitución a lo largo del tiempo, con filtros por:
+- Rango de fechas
+- Leyes específicas
+- Artículos
+
+---
+
+## Ejecutar con Docker
+
+Si prefieres usar contenedores:
 
 ```bash
+# Construir imagen
 docker build -t cl-legal-rag:1.0 .
-```
 
-2. Ejecutar app
-
-```bash
+# Ejecutar
 docker run --rm -p 8501:8501 \
   -e OPENAI_API_KEY=sk-... \
   -v $(pwd)/chroma_db:/app/chroma_db \
@@ -102,60 +81,53 @@ docker run --rm -p 8501:8501 \
   cl-legal-rag:1.0
 ```
 
-Notas:
-- Si quieres usar modo historico con datos locales, monta tambien `data/raw/constitucion_chile` en `/app/data/raw/constitucion_chile`.
-- Si la base vectorial aun no existe, primero ejecuta la ingesta desde tu entorno local con `uv run python scripts/ingest_history.py`.
+---
 
-## Fuente de datos raw
+## Datos e Ingesta
 
-Este proyecto usa como fuente historica:
-- `https://github.com/opensourcechile/constitucion_chile.git`
+La aplicación descarga automáticamente la fuente de datos de [opensourcechile/constitucion_chile](https://github.com/opensourcechile/constitucion_chile).
 
-Si no esta clonado en `data/raw/constitucion_chile`, ejecuta:
+Para reingestar datos (por ejemplo, después de actualizar el repositorio raw):
 
 ```bash
-git clone https://github.com/opensourcechile/constitucion_chile.git data/raw/constitucion_chile
+uv run python scripts/ingest_history.py
 ```
 
-## Logs de uso y costo OpenAI
+---
 
-Archivo:
-- `logs/openai_usage.jsonl`
+## Monitoreo de costos
 
-Cada evento guarda:
-- `endpoint`, `model`
-- metadatos de request
-- `prompt_tokens`, `completion_tokens`, `total_tokens`
-- `estimated_cost_usd`
-
-Resumen:
+La aplicación registra automáticamente el uso de OpenAI. Para ver un resumen:
 
 ```bash
 uv run python scripts/report_usage.py
 ```
 
-## Costos (orden de magnitud)
+Los logs se guardan en `logs/openai_usage.jsonl`.
 
-Con el dataset actual, la ingesta suele ser de costo bajo. Aun asi, monitorea siempre con `scripts/report_usage.py` y ajusta:
-- `retrieval_k`
-- largo de contexto inyectado
-- numero de consultas
+---
 
-## Buenas practicas
+## Documentación técnica
 
-- Usar `uv run ...` para ejecutar siempre dentro del entorno correcto.
-- No versionar `.env` ni `logs/`.
-- Mantener el repo raw como fuente de verdad historica.
-- Re-ingestar cuando actualices el repo raw.
+Para desarrolladores y mantenimiento del proyecto:
 
-## Troubleshooting
+**[docs/AGENT.md](docs/AGENT.md)** — Arquitectura detallada, configuración avanzada, troubleshooting
 
-- Error `max_tokens_per_request` en embeddings:
-  - ya mitigado con batching en `src/cl_legal_rag/embeddings.py`.
-- Respuesta sin contexto suficiente:
-  - el sistema debe responder con mensaje explicito de falta de informacion oficial.
+---
 
-## Documento de continuidad
+## Buenas prácticas
 
-Para retomar el proyecto en otra sesion con agentes, usa:
-- `docs/AGENT.md`
+- Siempre usa `uv run ...` para ejecutar comandos (asegura el entorno correcto)
+- No versionices `.env` ni la carpeta `logs/`
+- Mantén el repositorio raw (`data/raw/constitucion_chile/`) actualizado
+- Reingestar cuando actualices la fuente de datos
+
+---
+
+## Contribuciones
+
+Este proyecto es de código abierto. Si encuentras errores o tienes ideas de mejora, abre un issue o pull request.
+
+---
+
+**Última actualización:** Junio 2026
