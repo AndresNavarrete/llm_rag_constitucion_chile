@@ -1,0 +1,17 @@
+.git
+.gitignore
+.venv
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.ruff_cache/
+.agents/
+.codex/
+
+.env
+logs/
+chroma_db/
+data/raw/
+
+docs/assets/

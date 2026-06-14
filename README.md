@@ -10,8 +10,18 @@ Asistente RAG para consultas sobre la Constitucion Politica de la Republica de C
 Implementado y funcional en local:
 - Ingesta vigente (`scripts/ingest.py`) a coleccion `current_constitution`
 - Ingesta historica commit-aware (`scripts/ingest_history.py`) a coleccion `constitutional_history`
-- App Streamlit con modo `Vigente` y `Historica`
+- App Streamlit con modo `Vigente` y `Historica`, UI mejorada y filtros de alcance
 - Registro local de uso/costo OpenAI en `logs/openai_usage.jsonl`
+
+## Demo visual
+
+Vista principal de la app:
+
+![Vista principal](docs/assets/app_view.png)
+
+Ejemplo de respuesta con contexto:
+
+![Respuesta ejemplo](docs/assets/app_answer.png)
 
 ## Arquitectura
 
@@ -29,6 +39,16 @@ Implementado y funcional en local:
   - Estimacion de costos y escritura de eventos JSONL.
 - `app/main.py`
   - UI Streamlit + chat con control anti-alucinacion.
+  - Filtros historicos por ley y rango de fecha.
+  - Control de alcance de contexto (`top-k`) configurable desde la app.
+- `app/prompts/system_prompt.md`
+  - Prompt de sistema desacoplado del codigo Python.
+- `app/styles/main.css`
+  - Estilos visuales de la app.
+- `app/templates/hero.html`
+  - Bloque HTML de cabecera (hero).
+- `app/utils/resources.py`
+  - Loader centralizado de recursos de texto (CSS, templates, prompts).
 
 ## Requisitos
 
@@ -63,6 +83,28 @@ uv run python scripts/ingest_history.py
 ```bash
 uv run streamlit run app/main.py
 ```
+
+## Docker
+
+1. Construir imagen
+
+```bash
+docker build -t cl-legal-rag:1.0 .
+```
+
+2. Ejecutar app
+
+```bash
+docker run --rm -p 8501:8501 \
+  -e OPENAI_API_KEY=sk-... \
+  -v $(pwd)/chroma_db:/app/chroma_db \
+  -v $(pwd)/logs:/app/logs \
+  cl-legal-rag:1.0
+```
+
+Notas:
+- Si quieres usar modo historico con datos locales, monta tambien `data/raw/constitucion_chile` en `/app/data/raw/constitucion_chile`.
+- Si la base vectorial aun no existe, primero ejecuta la ingesta desde tu entorno local con `uv run python scripts/ingest_history.py`.
 
 ## Fuente de datos raw
 

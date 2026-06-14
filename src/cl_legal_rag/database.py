@@ -51,3 +51,23 @@ def search_similar(
         k=k,
         filter=metadata_filter,
     )
+
+
+def list_metadata_values(collection_name: str, field: str) -> List[str]:
+    """Lista valores unicos de un campo de metadata dentro de una coleccion."""
+    vector_store = load_vector_store(collection_name=collection_name)
+    payload = vector_store.get(include=["metadatas"])
+    metadatas = payload.get("metadatas", []) if payload else []
+
+    values = set()
+    for metadata in metadatas:
+        if not metadata:
+            continue
+        value = metadata.get(field)
+        if value is None:
+            continue
+        text_value = str(value).strip()
+        if text_value:
+            values.add(text_value)
+
+    return sorted(values)

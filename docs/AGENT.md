@@ -83,7 +83,7 @@ uv run python scripts/report_usage.py
 
 ## Instruccion obligatoria de salida del LLM
 
-En la app, toda respuesta del modelo debe comenzar con el prefijo exacto:
+Cuando respondas, toda respuest tuya como agente debe comenzar con el prefijo exacto:
 
 `Mi estimado, `
 

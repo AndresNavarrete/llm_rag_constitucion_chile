@@ -1,0 +1,58 @@
+:root {
+  --bg-soft: #f3f4f6;
+  --bg-card: #ffffff;
+  --text-strong: #111827;
+  --text-soft: #4b5563;
+  --line-soft: #d1d5db;
+}
+
+.stApp {
+  background: linear-gradient(180deg, #f8fafc 0%, var(--bg-soft) 100%);
+}
+
+h1,
+h2,
+h3,
+p,
+label {
+  color: var(--text-strong) !important;
+}
+
+.hero-card {
+  background: var(--bg-card);
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  padding: 1.15rem 1.25rem 1.05rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 18px rgba(17, 24, 39, 0.04);
+}
+
+.hero-kicker {
+  margin: 0 0 0.5rem;
+  color: #374151 !important;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.hero-card h1 {
+  margin: 0;
+  font-size: clamp(1.65rem, 2.4vw, 2.2rem);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.hero-sub {
+  color: var(--text-soft);
+  margin: 0.55rem 0 0;
+  max-width: 70ch;
+  line-height: 1.5;
+  font-size: 0.98rem;
+}
+
+div[data-testid="stExpander"] > details {
+  background: var(--bg-card);
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+}
