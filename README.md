@@ -6,7 +6,19 @@ Consulta el texto vigente de la constitución y su historia de cambios con preci
 
 ---
 
-## 🚀 Inicio rápido (3 pasos)
+## Demo Visual
+
+Vista principal de la aplicación:
+
+![Vista principal](docs/assets/app_view.png)
+
+Ejemplo de respuesta con contexto:
+
+![Respuesta ejemplo](docs/assets/app_answer.png)
+
+---
+
+## Inicio rápido (3 pasos)
 
 ### 1. Requisitos
 
@@ -28,34 +40,34 @@ uv sync
 echo "OPENAI_API_KEY=sk-..." > .env
 ```
 
-### 3. Ejecutar la app
+### 3. Ejecutar la aplicación
 
 ```bash
 uv run streamlit run app/main.py
 ```
 
-¡Listo! Abre `http://localhost:8501` en tu navegador.
+Abre `http://localhost:8501` en tu navegador.
 
 ---
 
-## 📖 Cómo usar
+## Cómo usar
 
-La app tiene **dos modos**:
+La aplicación tiene dos modos de operación:
 
-### Modo Vigente
+**Modo Vigente**
 Consulta el texto actual de la Constitución.
 
-### Modo Histórico
-Ve cómo ha cambiado la Constitución a lo largo del tiempo, filtrado por:
+**Modo Histórico**
+Visualiza cambios en la Constitución a lo largo del tiempo, con filtros por:
 - Rango de fechas
 - Leyes específicas
 - Artículos
 
 ---
 
-## 🐳 Usar con Docker
+## Ejecutar con Docker
 
-Si prefieres ejecutar en un contenedor:
+Si prefieres usar contenedores:
 
 ```bash
 # Construir imagen
@@ -71,11 +83,11 @@ docker run --rm -p 8501:8501 \
 
 ---
 
-## 💾 Datos e Ingesta
+## Datos e Ingesta
 
-La app descarga automáticamente la fuente de datos de [opensourcechile/constitucion_chile](https://github.com/opensourcechile/constitucion_chile).
+La aplicación descarga automáticamente la fuente de datos de [opensourcechile/constitucion_chile](https://github.com/opensourcechile/constitucion_chile).
 
-Si necesitas reingestar los datos (por ejemplo, después de actualizar el repositorio raw):
+Para reingestar datos (por ejemplo, después de actualizar el repositorio raw):
 
 ```bash
 uv run python scripts/ingest_history.py
@@ -83,9 +95,9 @@ uv run python scripts/ingest_history.py
 
 ---
 
-## 💰 Monitoreo de costos
+## Monitoreo de costos
 
-La app registra automáticamente el uso de OpenAI. Para ver un resumen:
+La aplicación registra automáticamente el uso de OpenAI. Para ver un resumen:
 
 ```bash
 uv run python scripts/report_usage.py
@@ -95,15 +107,15 @@ Los logs se guardan en `logs/openai_usage.jsonl`.
 
 ---
 
-## 📚 Documentación técnica
+## Documentación técnica
 
 Para desarrolladores y mantenimiento del proyecto:
 
-- **[docs/AGENT.md](docs/AGENT.md)** — Arquitectura detallada, configuración avanzada, troubleshooting
+**[docs/AGENT.md](docs/AGENT.md)** — Arquitectura detallada, configuración avanzada, troubleshooting
 
 ---
 
-## ⚙️ Buenas prácticas
+## Buenas prácticas
 
 - Siempre usa `uv run ...` para ejecutar comandos (asegura el entorno correcto)
 - No versionices `.env` ni la carpeta `logs/`
@@ -112,7 +124,7 @@ Para desarrolladores y mantenimiento del proyecto:
 
 ---
 
-## 🤝 Contribuciones
+## Contribuciones
 
 Este proyecto es de código abierto. Si encuentras errores o tienes ideas de mejora, abre un issue o pull request.
 
