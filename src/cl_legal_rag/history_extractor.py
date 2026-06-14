@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List
 
-from src.parser import ParsedChunk, extract_chapter_title, split_by_articles
+from cl_legal_rag.parser import ParsedChunk, extract_chapter_title, split_by_articles
 
 
 @dataclass(frozen=True)

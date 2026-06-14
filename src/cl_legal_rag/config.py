@@ -11,7 +11,7 @@ load_dotenv()
 class Settings:
     """Configuracion central de rutas y modelos."""
 
-    project_root: Path = Path(__file__).resolve().parent.parent
+    project_root: Path = Path(__file__).resolve().parents[2]
     data_file: Path = project_root / "data" / "constitucion.md"
     raw_repo_dir: Path = project_root / "data" / "raw" / "constitucion_chile"
     chroma_dir: Path = project_root / "chroma_db"
@@ -21,6 +21,8 @@ class Settings:
     history_collection_name: str = "constitutional_history"
 
     embedding_model: str = "text-embedding-3-small"
+    embedding_max_tokens_per_request: int = 250000
+    embedding_max_items_per_request: int = 256
     chat_model: str = "gpt-4o-mini"
     retrieval_k: int = 3
 
@@ -31,7 +33,7 @@ class Settings:
         if not api_key:
             raise ValueError(
                 "No se encontro OPENAI_API_KEY en variables de entorno. "
-                "Define la variable antes de ejecutar ingest.py o app.py"
+                "Define la variable antes de ejecutar scripts/ingest.py o app/main.py"
             )
         return api_key
 

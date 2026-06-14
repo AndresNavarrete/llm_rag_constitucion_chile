@@ -5,9 +5,9 @@ from typing import List, Optional, Tuple
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 
-from src.config import settings
-from src.embeddings import LoggedOpenAIEmbeddings
-from src.parser import ParsedChunk
+from cl_legal_rag.config import settings
+from cl_legal_rag.embeddings import LoggedOpenAIEmbeddings
+from cl_legal_rag.parser import ParsedChunk
 
 
 def build_embeddings() -> LoggedOpenAIEmbeddings:
